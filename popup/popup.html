@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Information</title>
+    <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <h1>פרטי פנייה:</h1>
+
+    <div id="ticket-info">
+        <div><strong>מספר פנייה:</strong> <span id="ticket-title">Loading...</span></div>
+        <div><strong>מיקום:</strong> <span id="ticket-location">Loading...</span></div>
+        <div><strong>תאריך:</strong> <span id="ticket-date">Loading...</span></div>
+        <div><strong>שם ותפקיד:</strong> <span id="ticket-creator">Loading...</span></div>
+        <div><strong>טלפון נייד:</strong> <span id="ticket-mobile">Loading...</span></div>
+        <div><strong>טלפון משרד:</strong> <span id="ticket-office">Loading...</span></div>
+        <div><strong>תיאור:</strong> <span id="ticket-text">Loading...</span></div>
+    </div>
+
+     <!-- Agent dropdown selector -->
+     <div>
+        <label for="agent-selector">בחר סוכן:</label>
+        <select id="agent-selector">
+            <option value="agent1">סוכן 1</option>
+            <option value="agent2">סוכן 2</option>
+            <option value="agent3">סוכן 3</option>
+            <option value="agent4">סוכן 4</option>
+        </select>
+    </div>
+
+    <button id="send-button" style="display: none;">שלח פנייה לטכנאי</button>
+
+    <script src="popup.js"></script>
+</body>
+</html>

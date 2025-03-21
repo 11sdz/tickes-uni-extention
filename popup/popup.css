@@ -1,0 +1,62 @@
+body {
+    font-family: 'Arial', sans-serif;
+    direction: rtl;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px; /* Use full viewport height */
+    width: 300px; /* Use full viewport width */
+    overflow: auto; /* Allow scrolling if content overflows */
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#ticket-info {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 90%; /* Use percentage for responsiveness */
+    max-width: 600px; /* Limit the max width */
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: auto; /* Allow scrolling within this container if content overflows */
+}
+
+#ticket-info div {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+#ticket-info strong {
+    font-weight: bold;
+}
+
+#ticket-info span {
+    display: inline-block;
+    padding-left: 10px;
+    font-weight: normal;
+    color: #7f8c8d;
+}
+
+#ticket-info span#ticket-title,
+#ticket-info span#ticket-date,
+#ticket-info span#ticket-location,
+#ticket-info span#ticket-mobile,
+#ticket-info span#ticket-office,
+#ticket-info span#ticket-text {
+    font-style: italic;
+    color: #e74c3c;
+}
+
+#ticket-info div:last-child {
+    margin-bottom: 0;
+}

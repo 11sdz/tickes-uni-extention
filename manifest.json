@@ -1,0 +1,28 @@
+{
+    "name": "Hello Extensions",
+    "description": "Base Level Extension",
+    "version": "1.0",
+    "manifest_version": 3,
+    "permissions": ["storage", "activeTab"],
+    "host_permissions": [
+        "https://pniot.ariel.ac.il/projects/tzmm/Tickets_Application.asp*",
+        "https://pniot.ariel.ac.il/projects/tzmm/Add_Get_Tickets.asp*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://pniot.ariel.ac.il/projects/tzmm/Tickets_Application.asp*",
+                "https://pniot.ariel.ac.il/projects/tzmm/Add_Get_Tickets.asp*"
+            ],
+            "js": ["content.js"],
+            "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_popup": "popup/popup.html",
+        "default_icon": "hello_extensions.png"
+    }
+}
