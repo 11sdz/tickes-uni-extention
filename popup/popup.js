@@ -1,76 +1,100 @@
-// Retrieve the ticket object from chrome storage
-let savedTicket = "";
-const sendButton = document.getElementById("send-button");
-chrome.storage.local.get(["savedTicket"], function (result) {
-    if (result.savedTicket) {
-        console.log("Ticket data retrieved:", result.savedTicket);
-        savedTicket = result.savedTicket;
-        // Update the HTML elements with the ticket data
-        document.getElementById("ticket-title").textContent =
-            savedTicket.title || "No title available";
-        document.getElementById("ticket-date").textContent =
-            savedTicket.date || "No date available";
-        document.getElementById("ticket-location").textContent =
-            savedTicket.location || "No location available";
-        document.getElementById("ticket-mobile").textContent =
-            savedTicket.phoneNumbers?.mobile || "No mobile number available";
-        document.getElementById("ticket-office").textContent =
-            savedTicket.phoneNumbers?.office || "No office number available";
-        document.getElementById("ticket-creator").textContent =
-            savedTicket.creator?.name+", "+savedTicket.creator?.position || "No creator available";
-        document.getElementById("ticket-text").textContent =
-            savedTicket.text || "No description available";
+document.addEventListener("DOMContentLoaded", async function () {
+    const agentSelector = document.getElementById("agent-selector");
+    const sendButton = document.getElementById("send-button");
 
-        sendButton.style.display = "inline-block"; // Or 'block' depending on the desired layout
-    } else {
-        console.log("No ticket data found in storage");
-        sendButton.style.display = 'none'; // Or 'block' depending on the desired layout
-    }
+    // Load saved ticket from Chrome storage
+    let savedTicket = null;
+    chrome.storage.local.get(["savedTicket"], async function (result) {
+        if (result.savedTicket) {
+            savedTicket = result.savedTicket;
+            console.log("Ticket data retrieved:", savedTicket);
 
-    document.addEventListener("DOMContentLoaded", function () {
-        // Access the agent dropdown element
-        const agentSelector = document.getElementById("agent-selector");
+            // Populate UI
+            document.getElementById("ticket-title").textContent = savedTicket.title || "No title available";
+            document.getElementById("ticket-date").textContent = savedTicket.date || "No date available";
+            document.getElementById("ticket-location").textContent = savedTicket.location || "No location available";
+            document.getElementById("ticket-mobile").textContent = savedTicket.phoneNumbers?.mobile || "No mobile number available";
+            document.getElementById("ticket-office").textContent = savedTicket.phoneNumbers?.office || "No office number available";
+            document.getElementById("ticket-creator").textContent =
+                `${savedTicket.creator?.name || ""}, ${savedTicket.creator?.position || ""}` || "No creator available";
+            document.getElementById("ticket-text").textContent = savedTicket.text || "No description available";
 
-        // Add an event listener to monitor when the user changes the selected agent
-        agentSelector.addEventListener("change", function () {
-            const selectedAgent = agentSelector.value; // Get the selected agent value
-            console.log("Selected Agent:", selectedAgent);
-        });
+            sendButton.style.display = "inline-block";
+        } else {
+            console.log("No ticket data found in storage");
+            sendButton.style.display = "none";
+        }
+
+        // Fetch agents
+        try {
+            const response = await fetch("http://localhost:5000/api/userStatus");
+            const agents = await response.json();
+
+            agentSelector.innerHTML = "";
+
+            const defaultOption = document.createElement("option");
+            defaultOption.textContent = "בחר סוכן";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            agentSelector.appendChild(defaultOption);
+
+            agents.forEach(agent => {
+                const option = document.createElement("option");
+                option.value = agent.userId;
+                option.textContent = `${agent.firstName} ${agent.lastName}`;
+                agentSelector.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error fetching agents:", error);
+        }
     });
 
+    agentSelector.addEventListener("change", function () {
+        const selectedAgentId = agentSelector.value;
+        const selectedAgentName = agentSelector.options[agentSelector.selectedIndex].textContent;
+        console.log("Selected Agent ID:", selectedAgentId);
+        console.log("Selected Agent Name:", selectedAgentName);
+    });
 
-    sendButton.addEventListener('click', () => {
-        // Prepare data to send
+    sendButton.addEventListener("click", () => {
+        if (!savedTicket) {
+            alert("אין פנייה לשליחה");
+            return;
+        }
+
+        const selectedAgent = agentSelector.value;
+        if (!selectedAgent) {
+            alert("אנא בחר סוכן לפני השליחה");
+            return;
+        }
+
         const dataToSend = {
             title: savedTicket.title,
             date: savedTicket.date,
             location: savedTicket.location,
             officeNumber: savedTicket.phoneNumbers?.office,
             mobileNumber: savedTicket.phoneNumbers?.mobile,
-            personalName: savedTicket.creator.name, // You can replace this with actual user data if available
+            personalName: savedTicket.creator.name,
             position: savedTicket.creator.position,
             text: savedTicket.text,
-            agent: document.getElementById('agent-selector').value // Get selected agent
+            agent: selectedAgent,
         };
 
-        // Send data to the API
-        fetch('http://localhost:5000/api/tickets', {
-            method: 'POST',
+        fetch("http://localhost:5000/api/tickets", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(dataToSend),
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Ticket sent successfully:', data);
-            // Handle success (e.g., show a success message to the user)
-            alert('Ticket sent successfully!');
-        })
-        .catch(error => {
-            console.error('Error sending ticket:', error);
-            // Handle error (e.g., show an error message to the user)
-            alert('Failed to send ticket. Please try again later.');
-        });
+            .then(response => response.json())
+            .then(data => {
+                console.log("Ticket sent successfully:", data);
+                alert("הפנייה נשלחה בהצלחה!");
+            })
+            .catch(error => {
+                console.error("Error sending ticket:", error);
+                alert("שליחת הפנייה נכשלה. נסה שוב מאוחר יותר.");
+            });
     });
 });
